@@ -26,11 +26,13 @@
   );
 
   let time: number = 0;
+  let lastPauseTime: number = 0;
+  let elapsedWhilePaused: number = 0;
 
   let paused = false;
   $: {
     if (!paused) {
-      time = (0.035 * $t) / 1000;
+      time = (0.035 * ($t - elapsedWhilePaused)) / 1000;
     }
 
     projection.rotate([
@@ -47,7 +49,14 @@
   }
 </script>
 
-<Canvas height={size} width={size} on:click={() => (paused = !paused)}>
+<Canvas height={size} width={size} on:click={() => {
+  paused = !paused;
+  if (paused) {
+    lastPauseTime = $t;
+  } else {
+    elapsedWhilePaused += $t - lastPauseTime;
+  }
+}}>
   <Layer
     render={({ context }) => {
       context.fillStyle = "black";
