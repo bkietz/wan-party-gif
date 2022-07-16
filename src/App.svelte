@@ -49,14 +49,24 @@
   }
 </script>
 
-<Canvas height={size} width={size} on:click={() => {
-  paused = !paused;
-  if (paused) {
-    lastPauseTime = $t;
-  } else {
-    elapsedWhilePaused += $t - lastPauseTime;
-  }
-}}>
+<input
+  type="button"
+  value={paused ? "Resume" : "Pause"}
+  on:click={() => {
+    paused = !paused;
+    if (paused) {
+      lastPauseTime = $t;
+    } else {
+      elapsedWhilePaused += $t - lastPauseTime;
+    }
+  }}
+/>
+
+<p>Simulation time: {time.toPrecision(3)} days</p>
+
+<br />
+
+<Canvas height={size} width={size}>
   <Layer
     render={({ context }) => {
       context.fillStyle = "black";
