@@ -18,14 +18,14 @@
 // our purposes, so we'd pass it three times per day.
 //
 // These constraints mean the simulation will repeat perfectly
-// every six orbits (or two days)- great since we're making a GIF
-// and it'd look janky otherwise.
+// every day- great since we're making a GIF and it'd look janky
+// otherwise.
 //
 // The sun has an angular diameter of half a degree from Earth, so
 // it won't really be visible as it blinks past unless this simulation
 // gets inordinately complicated.
 
-export const simulationRepeatTime = 2;
+export const simulationRepeatTime = 1;
 export const orbitsPerDay = 3;
 
 export function surfaceRotation(time: number): number {
