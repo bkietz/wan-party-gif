@@ -8,15 +8,8 @@
   export let projection: any;
   export let time: number;
 
-  let drawFeature: any;
-  let context: any;
-
-  function setup({ context: c }) {
-    context = c;
-    drawFeature = geoPath(projection, context);
-  }
-
-  $: render = () => {
+  $: render = ({context}) => {
+    const drawFeature = geoPath(projection, context);
     for (let { style, geometry } of geometries) {
       let feature: Feature = {
         type: "Feature",
@@ -36,4 +29,4 @@
   };
 </script>
 
-<Layer {setup} {render} />
+<Layer {render} />
