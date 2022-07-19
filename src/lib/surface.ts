@@ -35,8 +35,17 @@ function polygon(...coordinates: Position[][]): Polygon {
   return { type: "Polygon", coordinates };
 }
 
+const ocean: Style = Style.from({ fillStyle: "#002266" });
 const land0: Style = Style.from({ fillStyle: "#143f27" });
 const land1: Style = Style.from({ fillStyle: "#2e8b57" });
+const land1WithAlpha = (alpha: string)=> Style.from({
+  fillStyle: land1.fillStyle + alpha
+});
+const shadow = Style.from({ fillStyle: "#000000aa" });
+const nightLineStyle = Style.from({
+  strokeStyle: "#ffff00",
+  lineWidth: 2,
+});
 
 // incrementally-built feature for evoking lights on the night side of the planet
 const nightLines: [Position, Position][] = [];
@@ -46,6 +55,8 @@ function pushNightLines(...points: Position[]) {
 }
 
 function pushNightCrossHatching(spacing: number, ...points: Position[]) {
+  spacing *= 1.5;
+
   let [[x0, y0], [x1, y1]] = geoBounds({ type: "Polygon", coordinates: [points] });
   let [dx, dy] = [x1 - x0, y1 - y0];
   let [cx, cy] = [x0 + dx / 2, y0 + dy / 2];
@@ -85,11 +96,12 @@ function pushNightCrossHatching(spacing: number, ...points: Position[]) {
 
 // ocean
 geometries.push({
-  geometry: polygon([...line(0, 89, 360, 89)]),
-  style: Style.from({ fillStyle: "darkblue" }),
+  geometry: polygon([...line(0, 89.99, 360, 89.99)]),
+  style: ocean,
 });
 
 // ice caps
+/*
 geometries.push({
   geometry: geoCircle()
     .center([0, 90,])
@@ -104,9 +116,10 @@ geometries.push({
     (),
   style: Style.from({ fillStyle: "white" }),
 });
+*/
 
 function mouse(points: Iterable<Position>): Iterable<Position> {
-  return translate(160, -40, points);
+  return translate(150, -43, points);
 }
 
 // mouse
@@ -123,9 +136,7 @@ for (let x of [4, 16]) {
   const points = [...mouse(rect(x, 30, 10, 15, 2))];
   geometries.push({
     geometry: polygon(points),
-    style: Style.from({
-      fillStyle: land1.fillStyle + (x == 4 ? 'ff' : '99'),
-    }),
+    style: land1WithAlpha(x == 4 ? 'ff' : '99'),
   });
 
   pushNightLines(...inset(-0.5, points));
@@ -133,14 +144,14 @@ for (let x of [4, 16]) {
 }
 
 // mouse cord (only visible at night)
-pushNightLines(...translate(-15, 30, mouse([
+pushNightLines(...translate(-15, 32, mouse([
   ...arc(0, 40, 10, 185, 0),
   ...arc(20, 40, 10, 180, 270),
   ...arc(20, 20, 10, 90, -20),
 ])));
 
 function keeb(points: Iterable<Position>): Iterable<Position> {
-  return translate(0, -45, scale(0, 0, 1.5, points));
+  return translate(5, -45, scale(0, 0, 1.45, points));
 }
 
 // keyboard
@@ -176,9 +187,7 @@ for (let [x, y] of grid(8, 4)) {
 
   geometries.push({
     geometry: polygon(points),
-    style: Style.from({
-      fillStyle: land1.fillStyle + (isWasd || isSpacebar ? "ff" : alpha),
-    }),
+    style: land1WithAlpha(isWasd || isSpacebar ? "ff" : alpha),
   });
 
   pushNightLines(...inset(-0.5, points));
@@ -186,7 +195,7 @@ for (let [x, y] of grid(8, 4)) {
 }
 
 function gamepad(points: Iterable<Position>): Iterable<Position> {
-  return translate(235, 30, scale(0, 90, 1.3, points));
+  return translate(222, 20, scale(0, 90, 1.3, points));
 }
 
 geometries.push({
@@ -242,9 +251,7 @@ for (let [x, y] of grid(2, 2)) {
 
   geometries.push({
     geometry,
-    style: Style.from({
-      fillStyle: `#2e8b57${x == 0 ? "ff" : "88"}`
-    }),
+    style: land1WithAlpha(x == 0 ? "ff" : "88"),
   });
 
   pushNightLines(...inset(-0.5, geometry.coordinates[0]));
@@ -283,7 +290,7 @@ pushNightLines(
 function nightCenter(t: number): Position {
   // since we're painting this with all the surface features,
   // subtract the surface features' rotation which will be added later
-  return [absoluteRotation(t) - surfaceRotation(t), 0];
+  return [absoluteRotation(t) - surfaceRotation(t), -13];
 }
 
 geometries.push({
@@ -308,7 +315,7 @@ geometries.push({
 
     return multiLineString(...filtered());
   },
-  style: Style.from({ strokeStyle: "yellow" }),
+  style: nightLineStyle,
 });
 
 geometries.push({
@@ -316,5 +323,5 @@ geometries.push({
     .center(nightCenter(t) as [number, number])
     .radius(87)
     (),
-  style: Style.from({ fillStyle: "#000a" }),
+  style: shadow,
 });

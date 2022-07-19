@@ -5,7 +5,7 @@
   import { geoGraticule10, geoOrthographic } from "d3-geo";
   import { Style } from "./lib/style.js";
   import { geometries } from "./lib/surface.js";
-  import { sin, cos } from "./lib/geometry.js";
+  import { sin, cos, DEG } from "./lib/geometry.js";
   import {
     absoluteRotation,
     surfaceRotation,
@@ -19,7 +19,7 @@
   });
 
   const size = 256;
-  const border = size / 32;
+  const border = 0;
 
   const projection = geoOrthographic();
   projection.fitExtent(
@@ -36,21 +36,18 @@
   let elapsedWhilePaused: number = 0;
   let paused = false;
 
+  // ensure that the first frame is not rolled at all
+  const inclinationPhase = Math.asin(sin(absoluteRotation(0))) / DEG;
+
   $: if (!paused) {
-    time =
-      extractor?.getTime() ?? (0.02 * ($t - elapsedWhilePaused)) / 1000 + 0.45;
+    time = extractor?.getTime() ?? (0.02 * ($t - elapsedWhilePaused)) / 1000;
 
     projection.rotate([
       surfaceRotation(time),
       // add a slight inclination to the orbital plane
-      10 * sin(absoluteRotation(time)),
-      5 * cos(absoluteRotation(time)),
+      15 * cos(absoluteRotation(time) + inclinationPhase),
+      5 * sin(absoluteRotation(time) + inclinationPhase),
     ]);
-  }
-
-  let stars: [number, number][] = [];
-  for (let i = 0; i < 100; ++i) {
-    stars.push([Math.random() * size, Math.random() * size]);
   }
 
   let canvas: Canvas;
@@ -84,8 +81,19 @@
 <br />
 
 <Canvas bind:this={canvas} pixelRatio="1" height={size} width={size}>
+  <!--
+  
+	disabled black sky with stars for now
+  
   <Layer
-    render={({ context }) => {
+    render={(()=> {
+
+  let stars: [number, number][] = [];
+  for (let i = 0; i < 100; ++i) {
+    stars.push([Math.random() * size, Math.random() * size]);
+  }
+
+return ({ context }) => {
       context.fillStyle = "black";
       context.fillRect(0, 0, size, size);
 
@@ -93,8 +101,9 @@
       for (let [x, y] of stars) {
         context.fillRect(x, y, 1, 1);
       }
-    }}
+    }})()}
   />
+  -->
   <GeoLayer {geometries} {time} {projection} />
 </Canvas>
 

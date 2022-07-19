@@ -13,7 +13,7 @@
     if (!extractingFrames) {
       return null;
     }
-    return (frameIndex / totalFrames) * totalTime + 0.49;
+    return (frameIndex / totalFrames) * totalTime;
   }
 
   let frames: Promise<{
@@ -102,8 +102,6 @@
       tarUrl = URL.createObjectURL(new Blob([tarBuf]));
     };
   });
-
-  let frameFilter: string = "";
 </script>
 
 <input

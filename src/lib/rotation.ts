@@ -29,9 +29,9 @@ export const simulationRepeatTime = 1;
 export const orbitsPerDay = 3;
 
 export function surfaceRotation(time: number): number {
-  return -time * (orbitsPerDay - 1) * 360;
+  return -time * (orbitsPerDay - 1) * 360 - 273;
 }
 
 export function absoluteRotation(time: number): number {
-  return -time * orbitsPerDay * 360;
+  return -time * orbitsPerDay * 360 - 176;
 }

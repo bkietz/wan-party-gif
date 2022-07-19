@@ -27,6 +27,7 @@ ultimately generate a tarball of PNGs which you can aim
 gifsicle or another gif authoring tool at:
 
 ```
+tar -xf wan-party-gif-frames.tar
 cd wan-party-gif-frames
 
 # ImageMagick's convert can do this directly
@@ -43,6 +44,7 @@ gifsicle \
   --colors=256 \
   --optimize=3 \
   --loopcount=forever \
+  --disposal=background \
   --output=wan-party.gif \
   frame_*.gif
 ```
